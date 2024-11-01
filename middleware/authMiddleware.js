@@ -9,12 +9,10 @@ async function authMiddleware(req, res, next) {
       .status(StatusCodes.UNAUTHORIZED)
       .json({ msg: "authentication invalid" });
   }
-  
-  const token = authHeader.split(' ')[1];
-  console.log(authHeader);
-  console.log(token);
+  //aToken
+  const token = authHeader.split(" ")[1];
   try {
-    const { username, userid } = jwt.verify(token, "secret"); //decoded payload will be returned which is the information or claims encoded in the token.
+    const { username, userid } = jwt.verify(token, process.env.JWT_SECRET);
     // return res.status(StatusCodes.OK).json({ data });
     req.user = { username, userid };
     next();

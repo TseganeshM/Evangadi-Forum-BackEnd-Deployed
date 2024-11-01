@@ -22,7 +22,6 @@ const register = async (req, res) => {
       "SELECT username, userid from users where username = ? or email = ?",
       [username, email]
     );
-    // return res.json({ user: user });
     if (user.length > 0) {
       return res
         .status(StatusCodes.CONFLICT)
@@ -37,9 +36,9 @@ const register = async (req, res) => {
 
     //encrypt the password
     const salt = await bcrypt.genSalt(10);
-
     const hashedPassword = await bcrypt.hash(password, salt);
-    // register on the database
+
+    // Store registered user data on the database
     await dbConnection.query(
       "INSERT INTO users (username, firstname, lastname, email, password) VALUES (?,?,?,?,?)",
       [username, firstname, lastname, email, hashedPassword]
@@ -57,7 +56,6 @@ const register = async (req, res) => {
 
 //===============Login====================//
 const login = async (req, res) => {
-  // res.send("login");
   const { email, password } = req.body;
   if (!email || !password) {
     return res
@@ -66,11 +64,10 @@ const login = async (req, res) => {
   }
 
   try {
-    const [user]= await dbConnection.query(
+    const [user] = await dbConnection.query(
       "SELECT username, userid,password from users where email = ?",
       [email]
     );
-    //  return res.json({ user: user });  
     if (user.length == 0) {
       return res.status(StatusCodes.BAD_REQUEST).json({
         msg: "Invalid credentials ",
@@ -78,21 +75,19 @@ const login = async (req, res) => {
     }
 
     // compare password
-
     const isMatch = await bcrypt.compare(password, user[0].password);
     if (!isMatch) {
       return res.status(StatusCodes.UNAUTHORIZED).json({
         msg: "Invalid email or password",
       });
     }
-    
-    // return res.json({ user:user[0].password });
-
 
     const username = user[0].username;
     const userid = user[0].userid;
-    const token = jwt.sign({ username, userid }, "secret", { expiresIn: "1d" });
-    
+    const token = jwt.sign({ username, userid }, process.env.JWT_SECRET, {
+      expiresIn: "1d",
+    });
+
     return res.status(StatusCodes.OK).json({
       message: "User login successful",
       token,
