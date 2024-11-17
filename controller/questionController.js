@@ -48,7 +48,7 @@ async function getAllQuestions(req, res) {
         .json({ msg: "No questions found." });
     }
 
-    console.log(allQuestions);
+    //console.log(allQuestions);
     return res.status(StatusCodes.OK).json({ questions: allQuestions });
   } catch (error) {
     console.log(error.message);
