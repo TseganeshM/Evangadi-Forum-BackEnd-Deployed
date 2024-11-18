@@ -65,7 +65,7 @@ const login = async (req, res) => {
 
   try {
     const [user] = await dbConnection.query(
-      "SELECT username, userid,password from users where email = ?",
+      "SELECT username, userid, password from users where email = ?",
       [email]
     );
     if (user.length == 0) {
